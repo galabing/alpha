@@ -46,6 +46,7 @@ def main():
   num_bins = int(args.num_bins)
 
   total_histogram = None
+  count = 0
   score_files = os.listdir(args.score_dir)
   for sf in score_files:
     if not sf.endswith('.txt'):
@@ -76,9 +77,10 @@ def main():
       assert len(total_histogram) == num_bins
       for i in range(num_bins):
         total_histogram[i] += histogram[i]
-  with open('%s/total.csv' % args.histogram_dir, 'w') as fp:
+    count += 1
+  with open('%s/average.csv' % args.histogram_dir, 'w') as fp:
     for i in range(num_bins):
-      print('%d,%.2f' % (i+1, total_histogram[i]*100), file=fp)
+      print('%d,%.2f' % (i+1, total_histogram[i]*100/count), file=fp)
 
 if __name__ == '__main__':
   main()

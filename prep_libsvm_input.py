@@ -39,6 +39,13 @@ def main():
     if not rf.endswith('.csv'):
       continue
     print('Processing ranking file: %s' % rf)
+    libsvm_file = '%s/%s.txt' % (args.libsvm_dir, rf[:rf.find('.')])
+    # Actually it's not too bad if we regenerate the files -- it's fast,
+    # but the problem is that we don't want to retrain the models, which
+    # is slow, so to be consistent we don't regenerate old files at all.
+    if os.path.isfile(libsvm_file):
+      print('Libsvm file already exists: %s' % libsvm_file)
+      continue
     date = rf[:rf.find('.')]
     if date not in gain_map:
       print('!! Gains for %s is unknown' % date)
@@ -46,7 +53,7 @@ def main():
     with open('%s/%s' % (args.ranking_dir, rf), 'r') as fp:
       lines = fp.read().splitlines()
     num_bad_features, num_bad_labels = 0, 0
-    with open('%s/%s.txt' % (args.libsvm_dir, rf[:rf.find('.')]), 'w') as fp:
+    with open(libsvm_file, 'w') as fp:
       for row in csv.reader(lines[2:], delimiter=','):
         assert len(row) == 100
         ticker = row[1]
