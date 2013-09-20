@@ -3,10 +3,11 @@
 import os
 
 ios = [
-    ['alpha_scores', 'alpha_histograms2_30'],
-    ['libsvm_30_out_src', 'libsvm_src_histograms2_30'],
-    ['libsvm_30_out_dst', 'libsvm_dst_histograms2_30'],
-    ['libsvm_30_out_rec', 'libsvm_rec_histograms2_30']
+#    ['alpha_scores', 'alpha_histograms2_30'],
+#    ['libsvm_30_out_src', 'libsvm_src_histograms2_30'],
+#    ['libsvm_30_out_dst', 'libsvm_dst_histograms2_30'],
+#    ['libsvm_30_out_rec', 'libsvm_rec_histograms2_30'],
+    ['libsvms_30_a_out', 'libsvms_30_a_histograms2'],
 ]
 
 ks = [10, 20, 30]
