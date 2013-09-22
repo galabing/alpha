@@ -19,6 +19,9 @@ import os
 MIN_DAYS, MAX_DAYS = 30, 30*4
 TB_RATIO = 0.25  # Must < 0.5, otherwise there may be overlap in top/bottom.
 MAX_COUNT = 6000
+# If true, the top samples will be assigned +1 label, and the bottom samples
+# will be assigned -1 label, regardless of the gain.
+USE_RANK_LABEL = True
 
 # TODO: Also used by others.  Move up.
 def read_gain_map(gain_file):
@@ -108,16 +111,22 @@ def main():
 
       n = int(len(points) * r)
       for point in points[:n]:
+        label = 1
+        if not USE_RANK_LABEL:
+          label = calc_label(point[0])
         print('%d %s #%s#%s'
-              % (calc_label(point[0]),
+              % (label,
                  ' '.join(['%d:%f' % (i-2, point[i])
                           for i in range(3, len(point))]),
                  point[1],
                  point[2]),
               file=ofp)
       for point in points[-n:]:
+        label = -1
+        if not USE_RANK_LABEL:
+          label = calc_label(point[0])
         print('%d %s #%s#%s'
-              % (calc_label(point[0]),
+              % (label,
                  ' '.join(['%d:%f' % (i-2, point[i])
                           for i in range(3, len(point))]),
                  point[1],
@@ -128,7 +137,8 @@ def main():
 
   with open('%s/params' % args.libsvm_dir, 'w') as fp:
     print('MIN_DAYS=%d, MAX_DAYS=%d, TB_RATIO=%f, MAX_COUNT=%d'
-          % (MIN_DAYS, MAX_DAYS, TB_RATIO, MAX_COUNT), file=fp)
+          ', USE_RANK_LABEL=%s'
+          % (MIN_DAYS, MAX_DAYS, TB_RATIO, MAX_COUNT, USE_RANK_LABEL), file=fp)
 
 if __name__ == '__main__':
   main()
