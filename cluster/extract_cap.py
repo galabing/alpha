@@ -21,12 +21,13 @@ UNIT_MAP = {
   'B': BILLION,
 }
 CAPS = [
-  (200 * BILLION, 'mega'),
+#  (200 * BILLION, 'mega'),
   (10 * BILLION, 'large'),
   (2 * BILLION, 'mid'),
   (250 * MILLION, 'small'),
-  (50 * MILLION, 'micro'),
-  (0, 'nano'),
+#  (50 * MILLION, 'micro'),
+#  (0, 'nano'),
+  (0, 'micro'),
 ]
 
 def get_class(v):

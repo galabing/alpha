@@ -11,6 +11,7 @@
 """
 
 import argparse
+import os
 
 def main():
   parser = argparse.ArgumentParser()
@@ -38,7 +39,10 @@ def main():
 
   for f, ts in ticker_map.items():
     print('Class %s: %d tickers' % (f, len(ts)))
-    output_file = '%s/ticker_%s.txt' % (args.output_dir, f.replace(' ', '_'))
+    output_dir = '%s/%s' % (args.output_dir, f.replace(' ', '_'))
+    if not os.path.isdir(output_dir):
+      os.mkdir(output_dir)
+    output_file = '%s/tickers.txt' % output_dir
     with open(output_file, 'w') as fp:
       for t in sorted(ts):
         print(t, file=fp)

@@ -65,6 +65,10 @@ def main():
       if ticker in gain_map[date]:
         gains.append(gain_map[date][ticker])
     print('\t%d verifiable scores' % len(gains))
+    if len(gains) < num_bins:
+      print('\t!! Not enough verifiable scores for the number of bins: %d vs %d'
+            % (len(gains), num_bins))
+      continue
     histogram, mkt_gain = make_histogram(gains, num_bins)
     assert len(histogram) == num_bins
     print('\tMarket gain: %.2f%%' % (mkt_gain*100))
@@ -78,9 +82,10 @@ def main():
       for i in range(num_bins):
         total_histogram[i] += histogram[i]
     count += 1
-  with open('%s/average.csv' % args.histogram_dir, 'w') as fp:
-    for i in range(num_bins):
-      print('%d,%.2f' % (i+1, total_histogram[i]*100/count), file=fp)
+  if count > 0:
+    with open('%s/average.csv' % args.histogram_dir, 'w') as fp:
+      for i in range(num_bins):
+        print('%d,%.2f' % (i+1, total_histogram[i]*100/count), file=fp)
 
 if __name__ == '__main__':
   main()

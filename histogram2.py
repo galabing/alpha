@@ -56,6 +56,9 @@ def main():
       if ticker in gain_map[date]:
         gains.append(gain_map[date][ticker])
     print('\t%d verifiable scores' % len(gains))
+    if len(gains) < 2*abs(k):
+      print('\t!! Not enough verifable scores for k')
+      continue
     if k > 0:
       segment = gains[:k]
     else:
@@ -67,7 +70,8 @@ def main():
     tg += mg
     count += 1
     print('%s,%.2f,%.2f' % (date, ms, mg), file=ofp)
-  print('Avg,%.2f,%.2f' % (ts/count, tg/count), file=ofp)
+  if count > 0:
+    print('Avg,%.2f,%.2f' % (ts/count, tg/count), file=ofp)
   ofp.close()
 
 if __name__ == '__main__':
