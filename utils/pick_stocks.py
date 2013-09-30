@@ -7,6 +7,7 @@ def main():
   parser.add_argument('--score_file', required=True)
   parser.add_argument('--ticker_file', required=True)
   parser.add_argument('--tbk', required=True)
+  parser.add_argument('--print_scores', action='store_true')
   args = parser.parse_args()
 
   assert args.tbk.startswith('t') or args.tbk.startswith('b')
@@ -21,6 +22,8 @@ def main():
   ts_list = []
   for line in lines:
     ticker, score = line.split(' ')
+    if ticker not in tickers:
+      continue
     ts_list.append((ticker, score))
   assert k <= len(ts_list)
 
@@ -29,7 +32,10 @@ def main():
   else:
     r = range(len(ts_list)-1, len(ts_list)-k-1, -1)
   for i in r:
-    print('%s: %s' % (ts_list[i][0], ts_list[i][1]))
+    if args.print_scores:
+      print('%s: %s' % (ts_list[i][0], ts_list[i][1]))
+    else:
+      print('%s' % ts_list[i][0])
 
 if __name__ == '__main__':
   main()

@@ -136,7 +136,8 @@ def main():
   print('%d goods: %s' % (len(goods), goods))
   for r in [0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99]:
     print('%.2f%% position: %.2f%% gain'
-          % (r, goods[int(len(goods)*r)]*100))
+          % (r*100, goods[int(len(goods)*r)]*100))
+  print('Mean gain of all goods: %.2f%%' % (sum(goods)/len(goods)*100))
 
 if __name__ == '__main__':
   main()
