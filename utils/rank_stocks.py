@@ -68,6 +68,8 @@ def process(
     cp = 'put'
   key = '%s-%s-%.2f' % (ticker, cp, strike_price)
   if key in corrections:
+    print('Replacing asking price for %s from %.2f to %.2f'
+          % (key, ask, corrections[key]))
     ask = corrections[key]
   if ask < 0.001 or ask > MAX_ASK:
     return None
