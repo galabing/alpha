@@ -2,7 +2,7 @@
 
 import os
 
-folder = 'gng9'
+folder = 'price_0-20'
 
 lookahead = 30
 num_bins = 10

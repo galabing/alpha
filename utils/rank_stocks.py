@@ -4,8 +4,19 @@ import argparse
 import csv
 import os
 
-EXPECTED_GAIN_CALL = 0.1
-EXPECTED_GAIN_PUT = -0.1
+#EXPECTED_GAIN_CALL = 0.1
+#EXPECTED_GAIN_PUT = -0.1
+
+EG_CALL_MAP = {
+  10: 0.0975,
+  20: 0.0835,
+  30: 0.1014,
+}
+EG_PUT_MAP = {
+  10: -0.1156,
+  20: -0.1050,
+  30: -0.1205,
+}
 MAX_ASK = 2
 MIN_EXP = 90
 TGT_EXP = 110
@@ -15,16 +26,14 @@ K = 10
 def get_expected_gain(tbrank, call):
   assert tbrank >= 1 and tbrank <= 30
   if call:
-    expected_gain = EXPECTED_GAIN_CALL
-    delta = 0.005
+    for k in sorted(EG_CALL_MAP.keys()):
+      if tbrank <= k:
+        return EG_CALL_MAP[k]
   else:
-    expected_gain = EXPECTED_GAIN_PUT
-    delta = -0.005
-  if tbrank <= 10:
-    return expected_gain + delta
-  if tbrank <= 20:
-    return expected_gain
-  return expected_gain - delta
+    for k in sorted(EG_PUT_MAP.keys()):
+      if tbrank <= k:
+        return EG_PUT_MAP[k]
+  assert False
 
 def compute_num_contracts(ask):
   num_contracts = 1

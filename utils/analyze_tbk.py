@@ -38,7 +38,13 @@ def main():
   args = parser.parse_args()
 
   assert args.tbk.startswith('t') or args.tbk.startswith('b')
-  k = int(args.tbk[1:])
+  if args.tbk[1:].find('-') < 0:
+    j = 0
+    k = int(args.tbk[1:])
+  else:
+    j, k = args.tbk[1:].split('-')
+    j, k = int(j), int(k)
+    assert j <= k
 
   score_files = os.listdir(args.score_dir)
   dates = sorted([sf[:sf.find('.')] for sf in score_files
@@ -79,9 +85,9 @@ def main():
       else:
         total_bad += 1
     if top:
-      lines = lines[:k]
+      lines = lines[j:k]
     else:
-      lines = lines[-k:]
+      lines = lines[-k:len(lines)-j]
     good, bad, unknown = [], [], []
     profit = 0.0
     for line in lines:
