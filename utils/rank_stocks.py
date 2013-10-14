@@ -20,6 +20,7 @@ EG_PUT_MAP = {
 MAX_ASK = 2
 MIN_EXP = 90
 TGT_EXP = 110
+MAX_EXP = 180
 K = 10
 
 # HACK
@@ -40,6 +41,8 @@ def compute_num_contracts(ask):
   while (ask*num_contracts*100 < MIN_EXP
          and ask*(num_contracts+1)*100 <= TGT_EXP):
     num_contracts += 1
+  if ask*num_contracts*100 > MAX_EXP:
+    return 0
   return num_contracts
 
 def compute_profit(ask, num_contracts, low, high):
@@ -50,7 +53,11 @@ def compute_profit(ask, num_contracts, low, high):
   assert high > low
   exe = (high - low) * num_contracts * 100
   profit = exe - cost
-  return cost, profit, profit/cost
+  if cost == 0:
+    gain = 0
+  else:
+    gain = profit/cost
+  return cost, profit, gain
 
 def process(
     tbrank, ticker, stock_price, call, date_prefix, expected_gain, data,

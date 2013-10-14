@@ -4,7 +4,7 @@ import os
 
 folder = 'price_0-20'
 
-lookahead = 30
+lookahead = 12
 num_bins = 10
 script = '../histogram.py'
 cluster_home_dir = '../../data_alpha/cluster'

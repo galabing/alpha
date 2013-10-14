@@ -11,7 +11,7 @@ import datetime
 import os
 
 # The number of days in which gain is calculated.
-PERIOD_DAYS = 30
+PERIOD_DAYS = 61 #30
 # Eg, 2013-09-16.
 TIME_FORMAT = '%Y-%m-%d'
 # Max delay in days in finding stock price for a specified date.

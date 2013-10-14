@@ -3,7 +3,7 @@
 import os
 
 ks = [10, 20, 30]
-gdays = 30
+gdays = 12
 cluster_base = 'price_0-20'
 input_folder = 'alpha_scores'
 output_folder = 'alpha_histograms2_%d' % gdays

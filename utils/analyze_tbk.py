@@ -37,6 +37,12 @@ def main():
   parser.add_argument('--tbk', required=True)
   args = parser.parse_args()
 
+  lookahead = int(args.gain_file[args.gain_file.rfind('_')+1:args.gain_file.rfind('.')])
+  weeks = int(lookahead/7)
+  if lookahead % 7 > 0:
+    weeks += 1
+  print('Looking ahead %d weeks' % weeks)
+
   assert args.tbk.startswith('t') or args.tbk.startswith('b')
   if args.tbk[1:].find('-') < 0:
     j = 0
@@ -126,6 +132,7 @@ def main():
         % (bad_count, total_count, bad_count*100.0/total_count))
 #  print('Unknown: %d/%d - %.2f%%'
 #        % (unknown_count, total_count, unknown_count*100.0/total_count))
+  print('Sorted profits: %s' % ', '.join([('%.2f%%' % p) for p in sorted([p*100 for p in profits], reverse=True)]))
   mp = sum(profits)/len(profits)
   stdp = 0.0
   for p in profits:
@@ -135,11 +142,12 @@ def main():
   print('Total profit: %.2f%% with median %.2f%% and std %.2f%%, sharpe ~= %.2f'
         % (mp*100, sorted(profits)[int(len(profits)/2)]*100, stdp*100,
            mp/stdp))
+  print('Total profit per week: %.2f%%' % (mp*100/weeks))
   print('Total good vs bad: %d vs %d (%.2f%% vs %.2f%%)'
         % (total_good, total_bad, total_good*100.0/(total_good+total_bad),
            total_bad*100.0/(total_good+total_bad)))
   goods.sort(reverse=top)
-  print('%d goods: %s' % (len(goods), goods))
+  #print('%d goods: %s' % (len(goods), goods))
   for r in [0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99]:
     print('%.2f%% position: %.2f%% gain'
           % (r*100, goods[int(len(goods)*r)]*100))
