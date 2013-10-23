@@ -8,14 +8,10 @@ import os
 #EXPECTED_GAIN_PUT = -0.1
 
 EG_CALL_MAP = {
-  10: 0.0975,
-  20: 0.0835,
-  30: 0.1014,
+  30: 0.1282,
 }
 EG_PUT_MAP = {
-  10: -0.1156,
-  20: -0.1050,
-  30: -0.1205,
+  30: -0.1369,
 }
 MAX_ASK = 2
 MIN_EXP = 90
@@ -62,8 +58,15 @@ def compute_profit(ask, num_contracts, low, high):
 def process(
     tbrank, ticker, stock_price, call, date_prefix, expected_gain, data,
     corrections):
+  date_prefixes = date_prefix.split(',')
   symbol, last_sale, net, bid, ask, vol, open_interest = data
-  if not symbol.startswith('%s ' % date_prefix):
+  found = False
+  for dp in date_prefixes:
+    if symbol.startswith('%s ' % dp):
+      date_prefix = dp
+      found = True
+      break
+  if not found:
     return None
   if ask < 0.001:
     return None
@@ -76,7 +79,7 @@ def process(
   assert stock_price < 30
   # Sanity checks.
   assert strike_price > 0
-  assert strike_price < stock_price * 4
+  assert strike_price < stock_price * 10
   # Possible fix by corrections.
   if call:
     cp = 'call'
@@ -106,7 +109,7 @@ def process(
     high = strike_price
   cost, profit, gain = compute_profit(ask, num_contracts, low, high)
   return [tbrank, ticker, fp, stock_price, expected_price, strike_price, ask,
-          num_contracts, cost, profit, gain]
+          num_contracts, cost, profit, date_prefix, gain]
 
 def main():
   parser = argparse.ArgumentParser()
@@ -150,6 +153,7 @@ def main():
   print('Using %d corrections' % len(corrections))
 
   all_info = []
+  num_added = 0
   for i in range(len(tickers)):
     ticker = tickers[i]
     print('Processing ticker %s' % ticker)
@@ -183,11 +187,21 @@ def main():
       cs, cls, cn, cb, ca, cv, coi, ps, pls, pn, pb, pa, pv, poi, tmp = row
       assert tmp == ''
       if call:
-        data = [cs, float(cls), float(cn), float(cb), float(ca),
-                int(cv), int(coi)]
+        try:
+          data = [cs, float(cls), float(cn), float(cb), float(ca),
+                  int(cv), int(coi)]
+        except ValueError:
+          print('Dropping bad data point: %s' % row)
+          data = None
       else:
-        data = [ps, float(pls), float(pn), float(pb), float(pa),
-                int(pv), int(poi)]
+        try:
+          data = [ps, float(pls), float(pn), float(pb), float(pa),
+                  int(pv), int(poi)]
+        except ValueError:
+          print('Dropping bad data point: %s' % row)
+          data = None
+      if data is None:
+        continue
       info = process(
           i+1, ticker, stock_price, call, args.date_prefix, None, data,
           corrections)
@@ -197,14 +211,18 @@ def main():
       row_index += 1
     if not added:
       print('!!! Could not add one data point for ticker %s' % ticker)
+    else:
+      num_added += 1
   #print(all_info)
+  print('Added %d tickers' % num_added)
 
   all_info.sort(key=lambda info: info[-1], reverse=True)
   showed_tickers = set()
   k_cost, k_profit = 0, 0
+  rates = []
   for i in range(len(all_info)):
     (rank, ticker, fp, stock_price, expected_price, strike_price, ask,
-     num_contracts, cost, profit, gain) = all_info[i]
+     num_contracts, cost, profit, date_prefix, gain) = all_info[i]
     if ticker in showed_tickers:
       continue
     showed_tickers.add(ticker)
@@ -215,8 +233,17 @@ def main():
       rank = 't%d' % rank
     else:
       rank = 'b%d' % rank
-    print('Rank %d (%d), %s: %s (%s); gain = %.2f%%'
-          % (len(showed_tickers), i+1, rank, ticker, fp, gain*100))
+
+    delta = stock_price - strike_price
+    if call:
+      atask = ask - delta
+    else:
+      atask = ask + delta
+    assert atask > 0
+    rates.append(atask/stock_price)
+
+    print('Rank %d (%d), %s: %s (%s), %s; gain = %.2f%%'
+          % (len(showed_tickers), i+1, rank, ticker, fp, date_prefix, gain*100))
     print('  Stock price: current = %.2f, expected = %.2f'
           % (stock_price, expected_price))
     print('  Buy: strike = %.2f, ask = %.2f' % (strike_price, ask))
@@ -225,6 +252,7 @@ def main():
     print()
   print('Processed %d tickers' % len(showed_tickers))
   print('At %d: cost = %.2f, profit = %.2f' % (K, k_cost, k_profit))
+  print('Rates: %s - avg = %f, avg@10 = %f' % (rates, sum(rates)/len(rates), sum(rates[:10])/10))
 
 if __name__ == '__main__':
   main()

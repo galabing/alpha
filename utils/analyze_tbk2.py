@@ -11,7 +11,8 @@ C_RATE = 0.015
 # Premium price as a rate to investment.
 # On 2013-09-25, the call option for IM (51 days with strike price near trading
 # price) is 0.9 while the stock price is 22.5.
-P_RATE = 0.04
+# UPDATE: it's more like 0.06@10 from real data.
+P_RATE = 0.05 #0.06
 
 # For call:
 # Gain ~= (max(0, gain) - P_RATE) / P_RATE - k*C_RATE
@@ -48,12 +49,13 @@ def main():
   args = parser.parse_args()
 
   lookahead = int(args.gain_file[args.gain_file.rfind('_')+1:args.gain_file.rfind('.')])
+  delay = int(args.delay)
+  assert delay >= 0
+  print('Looking ahead %d days with %d days delay' % (lookahead, delay))
+  print('Label is %s' % args.tbk)
   weeks = int(lookahead/7)
   if lookahead % 7 > 0:
     weeks += 1
-  delay = int(args.delay)
-  assert delay >= 0
-  print('Looking ahead %d weeks with %d days delay' % (weeks, delay))
 
   with open(args.od_file, 'r') as fp:
     open_dates = sorted(fp.read().splitlines())
@@ -135,15 +137,13 @@ def main():
     print('Good: %s' % good)
     print('Bad: %s' % bad)
     print('==================================================')
-#  total_count = good_count + bad_count + unknown_count
   total_count = good_count + bad_count
   print('Summary for %d dates' % date_count)
   print('Good: %d/%d - %.2f%%'
         % (good_count, total_count, good_count*100.0/total_count))
   print('Bad: %d/%d - %.2f%%'
         % (bad_count, total_count, bad_count*100.0/total_count))
-#  print('Unknown: %d/%d - %.2f%%'
-#        % (unknown_count, total_count, unknown_count*100.0/total_count))
+  print('Unsorted profits: %s' % ', '.join(['%.2f%%' % (p*100) for p in profits]))
   print('Sorted profits: %s' % ', '.join([('%.2f%%' % p) for p in sorted([p*100 for p in profits], reverse=True)]))
   mp = sum(profits)/len(profits)
   stdp = 0.0

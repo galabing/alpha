@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 
-data_dir = '/Users/linyang/Projects/github/data_alpha/virtual/oh/2013-10-12'
+data_dir = '/Users/linyang/Projects/github/data_alpha/virtual/oh/2013-10-21'
 order_file = '%s/orders.csv' % data_dir
 order_date = '2013-10-01'
 position_file = '%s/positions.csv' % data_dir
@@ -45,6 +45,10 @@ for line in lines[1:]:
 #print(pos)
 
 tcost, tret = 0, 0
+costret_map = {
+  'Call': [0, 0],
+  'Put': [0, 0],
+}
 for item in items:
   desc, q, p = item
   assert desc in pos
@@ -54,15 +58,24 @@ for item in items:
   ticker, month, day, strike, cp = desc.split(' ')
   strike = float(strike)
   assert cp == 'Call' or cp == 'Put'
+  costret = costret_map[cp]
 
   c1, r1 = gain1(p, q, strike, last, cp)
   c2, r2 = gain2(p, q, bid)
   assert c1 == c2
   tcost += c1
   tret += max(r1, r2)
+  costret[0] += c1
+  costret[1] += max(r1, r2)
   print('%s:\n\t%s\t%s'
         % (desc, gain1(p, q, strike, last, cp), gain2(p, q, bid)))
 
 print('total cost = %.2f, total return = %.2f, gain = %.2f%%'
       % (tcost, tret, (tret - tcost)*100/tcost))
+costret = costret_map['Call']
+print('call: total cost = %.2f, total_return = %.2f, gain = %.2f%%'
+      % (costret[0], costret[1], (costret[1] - costret[0])*100/costret[0]))
+costret = costret_map['Put']
+print('put: total cost = %.2f, total_return = %.2f, gain = %.2f%%'
+      % (costret[0], costret[1], (costret[1] - costret[0])*100/costret[0]))
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 
-D='2013-10-06'
-P='13 Nov'
+D='2013-10-22'
+P='13 Dec,14 Jan'
 
 ./rank_stocks.py\
  --ticker_file=../../data_alpha/virtual/$D/t30.txt\

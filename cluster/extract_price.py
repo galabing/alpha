@@ -22,8 +22,8 @@ CAPS = [
   (5, '5-10'),
   (0, '0-5'),
 ]
-MAX_DATE = '2013-10-12'
-MIN_DATE = '2013-10-05'
+MAX_DATE = '2013-10-21'
+MIN_DATE = '2013-10-14'
 
 def get_class(v):
   for cap in CAPS:
